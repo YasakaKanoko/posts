@@ -69,6 +69,9 @@
        "editor.formatOnSave": true
    }
    ```
+<samp><b>VSCode-Keyboard-Shortcuts</b></samp>
+- <samp>`Ctrl` + `K` `Ctrl` + `[`：折叠</samp>
+- <samp>`Ctrl` + `K` `Ctrl` + `]`：展开</samp>
 
 ## LICENSE
 
