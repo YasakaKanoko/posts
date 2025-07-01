@@ -1,5 +1,5 @@
 ---
-date: 2025-05-20
+date: 2025-07-01
 title: TypeScript
 category: ts
 tags:
@@ -9,184 +9,42 @@ description:
 ---
 # **TypeScript**
 
-https://ts.yayujs.com/
+::: details 目录
 
-**为什么需要 TypeScript？**
+[[TOC]]
 
-JavaScript 的核心特点就是灵活，随着项目规模日益增大，灵活成为了开发者的负担，如：变量可以被赋予字符串、布尔、数值、函数，充满不确定性，因此需要类型约束。
-
-- TypeScript 更适合开发大型项目
-- TypeScript 在编写代码时提供丰富的语法提示
-- TypeScript 提供编译时类型检查，避免线上错误
-
-- 越来越多的大型项目开始拥抱 TypeScript ，如：Vue、Pinia、React 等
+:::
 
 ## **什么是 TypeScript？**
 
-TypeScript 是 JavaScript 超集，遵循 ES5/ES6 规范，TypeScript 扩展了 JavaScript 语法
+- TypeScript 是 JavaScript 超集，遵循 ES5/ES6 规范，TypeScript 扩展了 JavaScript 语法
 
-TS 代码需要转换为 JS 代码再运行
+- 需要先将 TS 代码转换为 JavaScript (JS) 代码才能执行
+- TypeScript 的主要目的是在开发阶段提供类型检查和更好的代码组织，但最终都需要通过编译器将其转换为 JS，以便在浏览器或 Node.js 中运行
 
 ### TS 编译器
 
-1. 编译器
+1. 初始化
 
-   ```sh
+   ::: code-group
+
+   ```sh[tsc]
    npm i -g typescript
-   ```
-
-2. 初始化配置文件 `tsconfig.json`
-
-   ```sh
    tsc --init
    ```
 
-3. 监视：适用于最终生成的结果
-
-   ```sh
-   tsc --watch
-   ```
-
-#### 热更新
-
-- 使用 vscode 插件：[Code Runner](https://marketplace.visualstudio.com/items?itemName=formulahendry.code-runner)
-
-- 使用 `nodemon`+`ts-node`
-
-  ::: code-group
-
-  ```json[packge.json]
-  "scripts": {
-    "dev": "nodemon --watch 'src/**' --ext 'ts,json' --ignore 'src/**/*.spec.ts' --exec 'ts-node src/index.ts'"
-  },
-  ```
-
-  :::
-
-- 使用 `bun`
-
-  ```sh
-  bun --hot run index.ts
-  ```
-
-- 通过构建工具生成 js 运行 (webpack、rollup、esbuild 等)
-
-
-
-
-
-
-
-## 编译选项
-
-"**编译(Compile)**"：TS 编译器将 TypeScript 代码编译成 JavaScript 代码的过程，编译时会将类型声明和相关的代码删除，不改变 JavaScript 的运行结果
-
-默认情况下，TS 编译器可能的**假设**
-
-- 假设当前环境是 DOM
-- 如果代码中未使用模块化，便认为当前代码是全局执行
-- 编译目标是 ES3
-
-**编译选项**：通过修改 `tsconfig.json` 编译选项改变 TypeScript 的假设
-
-1. 初始化项目
-
-   ::: code-group
-
-   ```sh[pnpm]
-   # 初始化
-   pnpm init
-   
-   # 安装类型编译器
-   pnpm i -D typescript
-   
-   # 初始化ts编译器, 生成ts配置文件
-   npx tsc --init
-   ```
-
    ```sh[bun]
-   bun init -y
+   bun init
    ```
 
    :::
 
-2. `tsconfig.json`
-
-   参考：[tsconfig.json](https://www.typescriptlang.org/tsconfig/)
-
-   ::: details
-
-   - `"outDir": "./dist"`：导出路径
-   - `"esModuleInterop": true`：改善CommonJS/ES模块互操作性
-   - `"forceConsistentCasingInFileNames": true`：强制文件导入路径大小写一致
-   - `"include": ["src"]`：包含的目录
-   - `"exclude": ["node_modules"]`：排除的目录
-   - `"strict": true`：严格类型检查
-     - `noImplicitAny`：不允许隐式 `any` 类型
-     - `strictNullChecks`：在类型检查中考虑 `null` 和 `undefined`
-     - `strictFunctionTypes`：在函数赋值时进行严格的类型检查
-     - `strictBindCallApply`：检查 `bind`, `call`, `apply` 方法的参数和返回值类型
-     - `strictPropertyInitialization`：检查类字段是否在构造函数中被初始化
-     - `strictBuiltinIteratorReturn`：内置迭代器的返回类型为 `undefined` 而不是 `any`
-     - `noImplicitThis`：不允许 `this` 具有隐式的 `any` 类型
-     - `useUnknownInCatchVariables`：默认情况下将 `catch` 变量视为 `unknown` 而不是 `any`
-     - `alwaysStrict`：确保在生成的 JavaScript 文件中包含 `'use strict'`
-   - `noImplicitUseStrict`：编译结果中不包含 `'use strict'`
-   - `removeComments`：编译结果不包含注释
-   - `noEmitOnError`：错误时不生成编译结果
-
-   :::
+2. 类型检查
 
    ::: code-group
 
-   ```json[tsconfig.json]
-   {
-     "compilerOptions": {
-     
-     	// Environment setup & latest features
-       "lib": ["ESNext"], // 生成的JavaScript版本
-       "target": "ESNext", // 内部类型声明库, 不包含dom   
-       "module": "Preserve", // TypeScript 编译器不会将其转换为其他模块系统
-       "moduleDetection": "force", // 强制 TypeScript 编译器检测模块文件的格式
-       "jsx": "react-jsx", // 指定生成的 JSX 代码的类型为 React.jsx
-       "allowJs": true, // 允许编译 JavaScript 文件
-       
-       // Bundler mode
-       "moduleResolution": "bundler", // 指定模块解析的模式为 bundler
-       "allowImportingTsExtensions": true, // 允许导入带有 .ts 和 .tsx 扩展名的文件
-       "verbatimModuleSyntax": true, // 确保 TypeScript 编译器在编译时不会对模块语法进行任何转换
-       "noEmit": true, // 不要生成任何 JavaScript 文件
-   
-       // Best practices
-       "strict": true, // 启用所有严格类型检查选项
-       "skipLibCheck": true, // 跳过所有 .d.ts 文件的类型检查
-       "noFallthroughCasesInSwitch": true, // 确保每个 case 语句都有明确的终止条件
-       "noUncheckedIndexedAccess": true, // 通过索引访问对象属性时，确保返回的类型包含 undefined
-       "noImplicitOverride": true, // 确保覆盖方法的意图是显式的
-   
-       // Some stricter flags (disabled by default)
-       "noUnusedLocals": false, // 关闭对未使用的本地变量的类型检查
-       "noUnusedParameters": false, // 禁止报告未使用的函数参数
-       "noPropertyAccessFromIndexSignature": false, // 关闭对从索引签名访问属性时的严格类型检查
-     },
-   }
-   ```
-
-   :::
-
-3. 依赖项
-
-   ::: code-group
-
-   ```sh[pnpm]
-   # TypeScript 的类型定义包
-   pnpm i -D @types/node
-   
-   # Node.js 执行环境，可以直接运行 TypeScript 文件
-   pnpm i -D ts-node
-   
-   # 监视文件变化的工具，当检测到项目中的文件发生变化时，会自动重启 Node.js 应用程序
-   pnpm i -D nodemon
+   ```sh[npm]
+   npm i -D @types/node
    ```
 
    ```sh[bun]
@@ -195,75 +53,315 @@ TS 代码需要转换为 JS 代码再运行
 
    :::
 
+#### 热更新 (可选)
 
-4. 脚本
+- 使用 vscode 插件：[Code Runner](https://marketplace.visualstudio.com/items?itemName=formulahendry.code-runner)
+
+- Node.js 需要使用 `Nodemon`
+
+  ::: code-group
+
+  ```sh[Node.js]
+  # "dev": "nodemon --watch 'src/**' --ext 'ts,json' --ignore 'src/**/*.spec.ts' --exec 'ts-node src/index.ts'"
+  npm run dev
+  ```
+
+  ```sh[bun]
+  bun --watch run index.ts
+  ```
+
+  :::
+
+- `tsc --watch`：热更新
+
+#### 构建工具
+
+1. 通过构建工具 (webpack、rollup、esbuild) 将 ts 转换为 js 运行
+
+   ```sh
+   npm i rollup typescript rollup-plugin-typescript2 @rollup/plugin-node-resolve -D
+   ```
+
+2. 配置文件
 
    ::: code-group
 
-   ```json[pnpm.package.json]
+   ```json[package.json]
    {
      "scripts": {
-       "dev": "nodemon --watch src -e ts --exec ts-node src/index.ts"
+       "dev": "rollup -c -w"
      },
+     "devDependencies": {
+       "@rollup/plugin-node-resolve": "^16.0.1",
+       "@types/node": "^24.0.8",
+       "rollup": "^4.44.1",
+       "rollup-plugin-typescript2": "^0.36.0",
+       "typescript": "^5.8.3"
+     }
    }
    ```
 
-   ```json[bun.package.json]
-   "scripts": {
-     "dev": "bun --hot run index.ts"
-   },
+   ```js[rollup.config.js]
+   import ts from 'rollup-plugin-typescript2'
+   import { nodeResolve } from '@rollup/plugin-node-resolve'
+   import { resolve, dirname } from 'path'
+   import { fileURLToPath } from 'url'
+   
+   
+   // 当前文件的绝对路径
+   const __filename = fileURLToPath(import.meta.url);
+   const __dirname = dirname(__filename)
+   export default {
+     // 项目入口文件
+     input: "./src/index.ts",
+     // 项目出口文件
+     output: {
+       // 打包的结果在dist目录
+       file: resolve(__dirname, 'dist/bundle.js'),
+       // 打包的结果是一个函数
+       format: 'iife',
+       sourcemap: true
+     },
+     plugins: [
+       nodeResolve({
+         // 第三方包入口文件可以是ts也可以是js
+         extensions: ['.ts', '.js']
+       }),
+       ts({
+         tsconfig: resolve(__dirname, 'tsconfig.json')
+       })
+     ]
+   }
+   ```
+
+   ```json[tsconfig.json]
+   {
+     "compilerOptions": {
+     
+     	// Environment setup & latest features
+       "lib": ["ESNext"], 
+       "target": "ESNext", 
+       "module": "esnext",
+       "moduleDetection": "force", 
+       "jsx": "react-jsx", 
+       "allowJs": true,
+       
+       // Bundler mode
+       "moduleResolution": "bundler",
+       "verbatimModuleSyntax": true, 
+       "outDir": "dist",
+       "sourceMap": true,
+   
+       // Best practices
+       "strict": true, 
+       "skipLibCheck": true, 
+       "noFallthroughCasesInSwitch": true,
+       "noUncheckedIndexedAccess": true,
+       "noImplicitOverride": true, 
+   
+       // Some stricter flags (disabled by default)
+       "noUnusedLocals": false, 
+       "noUnusedParameters": false,
+       "noPropertyAccessFromIndexSignature": false
+     }
+   }
    ```
 
    :::
 
-## 原始类型
-
-- `number`：数值
-
-- `string`：字符串
-
-- `boolean`：布尔值
-
-- `bigint`：大整数
-
-- `symbol`：符号
-
-  - 通过 `Symbol()` 函数生成，每一个 Symbol 值都是独一无二的
-
-    ```ts
-    let x: symbol = Symbol();
-    ```
-
-  - `unique symbol`：表示单个的、某个具体的 Symbol 值
-
-    ```ts
-    // unique symbol只能使用const声明
-    const x: unique symbol = Symbol();
-    
-    // const声明的symbol类型是unique symbol类型
-    const x = Symbol();
-    
-    // 如果需要写成同一个unique symbol类型, 只能写成typeof x
-    const a: unique symbol = Symbol();
-    const b: typeof a = a; 
-    
-    // Symbol.for(): 返回相同的 Symbol 值(虽然值是相等的，但是引用完全不同)
-    const a: unique symbol = Symbol.for('foo');
-    const b: unique symbol = Symbol.for('foo');
-    ```
 
 
+3. 项目结构
 
-- `undefined`：未定义
+   ```txt
+   ts
+   ├─ package-lock.json
+   ├─ package.json
+   ├─ rollup.config.ts
+   ├─ src
+   │  └─ index.ts
+   └─ tsconfig.json
+   ```
 
-- `null`：空
+## 基本类型
 
-  > [!NOTE]
-  >
-  > - `symbol` 和 `bigint` **无法直接获取它们的包装对象**
-  >
-  > - `null` 和 `undefined` 是所有类型的子类型，可以赋值给任意类型
-  > - **编译选项**开启 `strictNullChecks` 后，`undefined` 和 `null` 只能赋值给自身、`any`、`unknown`
+TS 是静态类型，关注的类型，而不是业务逻辑
+
+- TS 是从安全的角度考虑使用，在赋值时，是否发生错误
+- TS 发生在编译时，而非运行时
+- 编译结束后，可以在生产环境添加 `.d.ts` 来对 js 增加类型声明
+
+```ts
+// string
+const str: string = 'Alex'
+// number
+const n: number = 24;
+// boolean
+const b: boolean = true;
+// bigint
+const x: bigint = 123n;
+// symbol
+const s: symbol = Symbol('id');
+// null
+const r: null = null;
+// undefined
+const t: undefined = undefined;
+```
+
+> [!NOTE]
+>
+> - 原始类型 (`boolean`、`string`、`number`、`bigint`、`symbol`) 在声明时，应采用小写类型标识，而不是包装对象 (wrapper object)
+> - `null` 与 `undefined` 即是类型也是值
+>   - 当 `"strictNullChecks": false` 时，`null` 和 `undefined` 可以赋给任何类型 (即 `null` 和 `undefined` 是任意类型的子类型)
+>   -  当 `"strictNullChecks": true` 时，`undefined` 和 `null` 只能赋值给自身、`any`、`unknown`
+
+### 联合/交叉类型
+
+- `|`：联合类型；表示一个值可以是几种类型之一
+- `&`：交叉类型；多种类型叠加在一起成了一种类型，包含所需的所有类型的特性
+
+### 数组
+
+- `类型[]`
+- 泛型：`Array<类型>`
+
+```ts
+const arr1: number[] = [1, 2, 3, 4, 5, 6];
+const arr2: Array<number> = [1, 2, 3, 4, 5, 6];
+const arr3: (number | string)[] = [1, 2, 3, 'a', 'b', 'c'];
+```
+
+### 元组
+
+元组 (tuple) 必须符合结构和顺序，所以元组必须明确声明每个成员的类型
+
+新增元素时，必须是元组已知类型
+
+```ts
+let tuple1: [string, number, string, number] = ["a", 1, "b", 2];
+
+// 别名
+let tuple2: [a: string, b: number, c: string, d: number] = ["a", 1, "b", 2];
+
+tuple2.push('1');
+// 访问时报错
+const a = tuple2[4]; // [!code error] 长度为 "4" 的元组类型 "[a: string, b: number, c: string, d: number]" 在索引 "4" 处没有元素。
+```
+
+### 枚举
+
+枚举 (`enum`)，在 js 中表现为一个自带类型的对象
+
+**约定一组格式**：状态码、权限、数据格式、标志位
+
+- 维护一组常量时，使用枚举
+
+  ```ts
+  enum STATUS {
+    'OK',
+    'ERROR',
+    'NOT_FOUND'
+  }
+  ```
+
+- 当值为数字时，枚举可以反举 (值会根据索引位置自增)
+
+  ```ts
+  console.log(STATUS[0]); // OK
+  // 自增
+  console.log(STATUS.NOT_FOUND); // 2
+  ```
+
+- 异构枚举：枚举中有字符串时，下一个位置无法推导
+
+  ```ts
+  enum STATUS {
+    'OK' = 'OK',
+    'ERROR', // [!code error] 枚举成员必须具有初始化表达式。
+    'NOT_FOUND' // [!code error] 枚举成员必须具有初始化表达式。
+  }
+  ```
+
+- 常量枚举
+
+  ```ts
+  const enum STATUS {
+    'OK',
+    'ERROR',
+    'NOT_FOUND'
+  }
+  ```
+
+### void
+
+`void` 表示表示函数无返回值
+
+- `undefined` 可以赋值给 `void` (`undefined` 是 `void` 的子类型)
+
+  在 JavaScript 中，`forEach` 无返回值 (隐式返回 `undefined`)
+
+  ```ts
+  let arr: number[] = [1, 2, 3];
+  arr.forEach((item): void => {
+    console.log(item);
+  })
+  ```
+
+- 当函数的返回值没有意义时，如：将日志输出至控制台
+
+  ```ts
+  function log(msg: string): void {
+    console.log(msg);
+  }
+  ```
+
+### never
+
+`never`：表示函数无法执行完毕
+
+```ts
+const whileTrue = (): never => {
+  while (true) { 
+    console.log('函数无法达到执行完毕的状态');
+  }
+}
+```
+
+抛出错误
+
+```ts
+function throwError(err: string): never {
+  throw new Error(err);
+}
+```
+
+
+
+
+
+- 通过 `Symbol()` 函数生成，每一个 Symbol 值都是独一无二的
+
+- `unique symbol`：表示单个的、某个具体的 Symbol 值
+
+  ```ts
+  // unique symbol只能使用const声明
+  const x: unique symbol = Symbol();
+  
+  // const声明的symbol类型是unique symbol类型
+  const x = Symbol();
+  
+  // 如果需要写成同一个unique symbol类型, 只能写成typeof x
+  const a: unique symbol = Symbol();
+  const b: typeof a = a; 
+  
+  // Symbol.for(): 返回相同的 Symbol 值(虽然值是相等的，但是引用完全不同)
+  const a: unique symbol = Symbol.for('foo');
+  const b: unique symbol = Symbol.for('foo');
+  ```
+
+
+
+> - **编译选项**开启
 
 **类型约束**：常用于约束**变量**、**函数参数**、**函数返回值**
 
@@ -343,7 +441,7 @@ interface Obj2 {
 
   :::
 
-- 如果打开 `"exactOptionalPropertyTypes"` 和 `"strictNullChecks"` 选项，则可选属性不能设为 `undefined` 
+- 如果打开 `"exactOptionalPropertyTypes"` 和 `"strictNullChecks"` 选项，则可选属性不能设为 `undefined`
 
   ::: code-group
 
@@ -1361,4 +1459,10 @@ import myModule = require ('./myModule'); // [!code ++]
 
 - classic：递归查找模块
 - bundler：bundler 模式，使用打包工具解析规则，在打包过程中将所有模块打包成一个文件
-- node：查找本地 node_modules，再查找库 
+- node：查找本地 node_modules，再查找库
+
+## References
+
+- [TypeScript 中文文档](https://ts.yayujs.com/)
+
+- [TypeScript 教程](https://wangdoc.com/typescript/)

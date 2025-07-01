@@ -18,11 +18,28 @@ description: A language empowering everyone to build reliable and efficient soft
 
 
 
+
+
 ## Installation
 
-- [安装](https://course.rs/first-try/installation.html)
+[安装](https://course.rs/first-try/installation.html)
 
-### vscode Extensions
+```sh
+# 升级
+$ rustup update
+
+# 卸载
+$ rustup self uninstall
+
+# 查看版本
+$ rustc -V
+rustc 1.87.0 (17067e9ac 2025-05-09)
+
+$ cargo -V
+cargo 1.87.0 (99624be96 2025-05-06)
+```
+
+### VSCode Extensions
 
 - [Code Runner](https://marketplace.visualstudio.com/items?itemName=formulahendry.code-runner)
 
@@ -33,6 +50,31 @@ description: A language empowering everyone to build reliable and efficient soft
 - [Error Lens](https://marketplace.visualstudio.com/items?itemName=usernamehw.errorlens)
 
 - [CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)
+
+## Hello World
+
+::: code-group
+
+```rust[main.rs]
+fn main() {
+  println!("Hello World!");
+}
+```
+
+```sh
+$ rustc main.rs
+$ ./main
+```
+
+:::
+
+## Variables
+
+- **Assigned**: using `let` keyword
+- **Print**: to standard output by `print!()` or `println!()`
+- **Scope** of a variables defined by **the block of code** in which it is **declared**
+- **Function** is a named block of code that is **reusable**
+- **Shadowing** allows a variable to be **re-declared** in the **same scope** with the **same name**
 
 ## cargo
 
