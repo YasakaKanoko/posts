@@ -1,28 +1,23 @@
 {
-  "name": "dynamic-circle-demo",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "ti.bi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "dev": "vitepress dev --host 0.0.0.0",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
   },
-  "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
-  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
   "devDependencies": {
-    "@eslint/js": "^9.25.0",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
-    "@vitejs/plugin-react": "^4.4.1",
-    "eslint": "^9.25.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^16.0.0",
-    "vite": "^6.3.5"
-  },
-  "packageManager": "pnpm@9.14.4+sha1.64b6e81e79630419b675c555ef3b65607cfd6315"
+    "markdown-it-mathjax3": "^4.3.2",
+    "fs-extra": "^11.3.0",
+    "globby": "^14.1.0",
+    "gray-matter": "^4.0.3",
+    "vitepress": "^1.6.3",
+    "vitepress-plugin-comment-with-giscus": "^1.1.15"
+  }
 }
