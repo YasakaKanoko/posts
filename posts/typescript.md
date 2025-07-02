@@ -5,7 +5,7 @@ category: ts
 tags:
 - ts
 - js
-description: 
+description: TypeScript is JavaScript with syntax for types.
 ---
 # **TypeScript**
 
@@ -62,8 +62,8 @@ description:
   ::: code-group
 
   ```sh[Node.js]
-  # "dev": "nodemon --watch 'src/**' --ext 'ts,json' --ignore 'src/**/*.spec.ts' --exec 'ts-node src/index.ts'"
-  npm run dev
+  # "start": "nodemon --watch src -e ts --exec ts-node src/index.ts"
+  npm run start
   ```
 
   ```sh[bun]
@@ -169,8 +169,6 @@ description:
 
    :::
 
-
-
 3. 项目结构
 
    ```txt
@@ -213,7 +211,7 @@ const t: undefined = undefined;
 > - 原始类型 (`boolean`、`string`、`number`、`bigint`、`symbol`) 在声明时，应采用小写类型标识，而不是包装对象 (wrapper object)
 > - `null` 与 `undefined` 即是类型也是值
 >   - 当 `"strictNullChecks": false` 时，`null` 和 `undefined` 可以赋给任何类型 (即 `null` 和 `undefined` 是任意类型的子类型)
->   -  当 `"strictNullChecks": true` 时，`undefined` 和 `null` 只能赋值给自身、`any`、`unknown`
+>   - 当 `"strictNullChecks": true` 时，`undefined` 和 `null` 只能赋值给自身、`any`、`unknown`
 
 ### 联合/交叉类型
 
@@ -222,8 +220,8 @@ const t: undefined = undefined;
 
 ### 数组
 
-- `类型[]`
-- 泛型：`Array<类型>`
+- `T[]`
+- 泛型：`Array<T>`
 
 ```ts
 const arr1: number[] = [1, 2, 3, 4, 5, 6];
@@ -317,319 +315,180 @@ const a = tuple2[4]; // [!code error] 长度为 "4" 的元组类型 "[a: string,
 
 ### never
 
-`never`：表示函数无法执行完毕
-
-```ts
-const whileTrue = (): never => {
-  while (true) { 
-    console.log('函数无法达到执行完毕的状态');
-  }
-}
-```
-
-抛出错误
-
-```ts
-function throwError(err: string): never {
-  throw new Error(err);
-}
-```
-
-
-
-
-
-- 通过 `Symbol()` 函数生成，每一个 Symbol 值都是独一无二的
-
-- `unique symbol`：表示单个的、某个具体的 Symbol 值
+- 表示函数无法执行完毕
 
   ```ts
-  // unique symbol只能使用const声明
-  const x: unique symbol = Symbol();
-  
-  // const声明的symbol类型是unique symbol类型
-  const x = Symbol();
-  
-  // 如果需要写成同一个unique symbol类型, 只能写成typeof x
-  const a: unique symbol = Symbol();
-  const b: typeof a = a; 
-  
-  // Symbol.for(): 返回相同的 Symbol 值(虽然值是相等的，但是引用完全不同)
-  const a: unique symbol = Symbol.for('foo');
-  const b: unique symbol = Symbol.for('foo');
+  const whileTrue = (): never => {
+    while (true) { 
+      console.log('函数无法达到执行完毕的状态');
+    }
+  }
   ```
 
+- 抛出错误
 
+  ```ts
+  function throwError(err: string): never {
+    throw new Error(err);
+  }
+  ```
 
-> - **编译选项**开启
+### any
 
-**类型约束**：常用于约束**变量**、**函数参数**、**函数返回值**
+`any`：任意类型，`any` 是所有类型的全集
+
+- 关闭类型检查
+- 污染其他变量
+
+> [!NOTE]
+>
+> `"noImplicitAny": true` 时，类型推断为 `any` 就会报错
+
+### unknown
+
+`unknown`：严格的 `any`
+
+- `unknown` 类型变量不能直接赋值给其他类型变量 (除了 `any` 和 `unknown`)
+- 不能直接调用 `unknown` 类型变量的方法和属性
+
+- `unknown` 类型参与的运算是有限的，只能比较运算 (`==`、`===`、`!=`、`!==`、`||`、`&&`、`?`)、取反 (`!`)、`typeof`、`instanceof` 运算
+
+## 引用类型
+
+- `object`：包含**对象**、**数组**、**函数**，不包含原始类型的值
+
+- `Object`：大写形式，包含原始类型
+
+## 类型断言
+
+声明类型时，没有标识类型，TS 会进行类型断言
+
+- 未赋值的变量默认值为 `undefined`，但其类型断言为 `any`
+
+- 如果是联合类型，只能调用它们的公共方法
+
+  ```ts
+  let str: string | number;
+  str = 1;
+  str.toFixed();
+  ```
+
+- `value as T`：断言成某种类型 (已有类型中的某个类型)
+
+- 非空断言：`!`  这个值一定不为空
+
+  ```ts
+  let str: string | number;
+  (str! as string).charCodeAt(0)
+  ```
+
+- `<T>value`：泛型断言，不建议使用，与 JSX 语法相似
+
+  ```ts
+  (<number>str!).toFixed(3)
+  ```
+
+- 双重断言：将类型范围缩小，断言成子类型，破坏原有关系
+
+  ```ts
+  (str! as unknown as boolean);
+  ```
+
+## 可选属性
+
+`?`：标识属性可选，取值操作，不能赋值
 
 ```ts
-const q: string = 'string';
-const w: number = 1;
-const e: boolean = true;
-const r: null = null;
-const t: undefined = undefined;
+let ele = document.getElementById('app');
+ele?.style.background = 'red'; // [!code error] [!code --] 赋值表达式的左侧不能是可选属性访问。
+ele?.style.background; // [!code ++]
 ```
 
-## object
+::: info 注意：`!`、`?` 与 `??`
 
-- `object`：**非原始类型**；包含**对象**、**数组**和**函数**
+- 可选属性 `?` 不能赋值
 
-  > **非原始类型**：除了 `number`、`string`、`boolean`、`symbol`、`bigint`、`null`、`undefined` 之外的任何类型
+- 非空断言 `!` 可以赋值
 
-- `Object`：所有可转换为对象值的构造函数；简写形式：`{}`
+  ```ts
+  let ele = document.getElementById('app');
+  ele!.style.background = 'red';
+  (ele as HTMLElement).style.color = 'white';
+  ```
 
-  > 除了 `undefined`、`null`
+- 空值合并运算符 `??`：默认值，保证不为  `null` 与 `undefined`
+
+  ```ts
+  const valA = 0 ?? 100; // 0
+  const valB = null ?? 100; // 100
+  ```
+
+:::
+
+## 类型别名
+
+`type`：快速构建一个可复用的类型
+
+```ts
+// 数组
+type IArr1 = number[];
+// 数组泛型
+type IArr2 = Array<string | number | Record<string, number>>;
+// 元组
+type IArr3 = [number, number, string, string];
+```
+
+## 函数
+
+- **函数声明式**：`function` 关键字声明的函数会提升至当前作用域的顶部；在 ts 中，函数声明式声明的关键字，不能标注函数类型
+
+  ```ts
+  function sum(a: number, b: number): number {
+    return a + b;
+  }
+  ```
+
+- **函数表达式**：函数表达式声明的函数，赋予的值必须满足定义类型
+
+  ```ts
+  // 函数类型 (a: any, b: any) => any
+  const sum: (a: any, b: any) => any = function (a, b) {
+    return a + b;
+  }
+  
+  // (a: any, b: any): any
+  const sum: { (a: any, b: any): any } = function (a, b) {
+    return a + b;
+  }
+  ```
+
+  > 如果函数已标明类型，在使用函数时，以标明的为准 
   >
-  > - `boolean`、`string`、`number`、`bigint`、`symbol`
-  
-  ```ts
-  let obj: Object;
-  
-  obj = true;
-  obj = 'hi';
-  obj = 1;
-  obj = { foo: 123 };
-  obj = [1, 2, 3];
-  obj = (a: number) => { a + 1 };
-  ```
+  > ```ts
+  > type ISum = { (a: any, b: any): any };
+  > const sum: ISum = (a: string, b: string) => {
+  >   return a + b;
+  > }
+  > ```
 
-### 对象
+### 可选参数
 
-声明了对象类型，赋值时不能缺少指定属性，也不能有多余的属性
+**可选参数**：在参数末尾加上 `?` 表示参数可选
 
-```ts
-type Obj1 = {
-  x:number;
-  y:number;
-};
-
-interface Obj2 {
-  x: number;
-  y: number;
-}
-```
-
-#### 可选属性
-
-- 可选属性等同于 undefined，在属性名前使用 `?` 表示
-
-  ```ts
-  type User = { name?: string; }
-  let user: User = {};
-  ```
-
-- 读写可选属性前，需要先判断是否为 `undefined`
-
-  ::: code-group
-
-  ```ts[===运算符]
-  if (user.name === undefined) {
-    user.name = 'Alice';
-  }
-  ```
-
-  ```ts[?:运算符]
-  (user.name === undefined) ? 'Alice' : user.name;
-  ```
-
-  ```ts[空值合并运算符]
-  user.name ?? 'Alice';
-  ```
-
-  :::
-
-- 如果打开 `"exactOptionalPropertyTypes"` 和 `"strictNullChecks"` 选项，则可选属性不能设为 `undefined`
-
-  ::: code-group
-
-  ```ts[tsconfig.json]
-  {
-    "compilerOptions": {
-      "strictNullChecks": true,
-      "exactOptionalPropertyTypes": true,   
-    }
-  }
-  ```
-
-  :::
-
-#### 只读属性
-
-属性名前加上 `readonly` 关键字，表示只读属性，不能修改
-
-- 只读属性值只能在初始化期间赋值，此后不能修改该属性
-
-- `readonly` 修饰符并不禁止修改该对象的属性，只是禁止完全替换该对象
-
-  ```ts
-  interface Home {
-    readonly resident: {
-      name: string;
-      age: number;
-    }
-  }
-  
-  const h: Home = {
-    resident: {
-      name: "Alice",
-      age: 17
-    }
-  }
-  
-  h.resident = { name: 'Kate' }; // [!code --] 无法为“resident”赋值，因为它是只读属性。
-  h.resident.age = 18; // [!code ++]
-  ```
-
-- 如果一个对象有两个引用，那么修改其中一个，会影响只读变量
-
-  ```ts
-  interface Person { name: string; age: number; }
-  interface ReadonlyPerson { readonly name: string; readonly age: number; }
-  
-  let w: Person = { name: 'Vicky', age: 42 };
-  let r: ReadonlyPerson = w;
-  w.age += 1;
-  
-  console.log(w.age); // 43
-  console.log(r.age); // [!code warning] 43
-  ```
-
-
-#### 索引类型
-
-- 同名索引的属性名的类型可以不同，但是必须优先服从字符串类型
-
-  ```ts
-  type MyType = {
-    [x: string]: string;
-    [x: number]: string; // ✅
-  }
-  ```
-
-- 同名索引的属性值的类型必须相同
-
-  ```ts
-  type MyType = {
-    [x: string]: string;
-    [x: number]: number; // [!code error] “number”索引类型“number”不能分配给“string”索引类型“string”。
-  }
-  ```
-
-#### 对象解构
-
-- 解构赋值
-
-  ```ts
-  let product = { id: '1', name: 'cup', price: 3 }
-  
-  const { id, name, price }: {
-    id: string;
-    name: string;
-    price: number
-  } = product;
-  ```
-
-- 为解构的属性命名
-
-  ```ts
-  let obj = { x: 'Hello', y: 1 };
-  
-  let { x: foo, y: bar }
-    : { x: string; y: number } = obj;
-  
-  console.log(foo, bar);
-  ```
-
-
-
-### 数组
-
-- **字面量**：「类型+方括号」
-- **泛型**：`Array<T>`
-
-  > 建议少用泛型的形式声明数组，因为在 React 中尖括号会被识别为组件
-
-#### 只读数组
-
-- 字面量加上 `readonly` 关键字
-
-  ```ts
-  const arr: readonly number[] = [0, 1];
-  ```
-
-- 泛型
-
-  ```ts
-  const a1: ReadonlyArray<number> = [0, 1];
-  
-  const a2: Readonly<number[]> = [0, 1];
-  ```
-
-#### 多维数组
-
-使用 `T[][]` 声明二维数组
-
-```ts
-var multi: number[][] = [
-  [1, 2, 3],
-  [23, 24, 25]
-];
-```
-
-#### 元组
-
-元组(tuple)：元组必须声明每个成员的类型
-
-- `?`：表示该成员可选；可选成员必须在必选成员之后
-
-  ```ts
-  type tuple = [number, string?];
-  ```
-
-- `...`：扩展运算符，表示不限成员数量的元组
-
-  ```ts
-  type tuple = [number, ...string[]];
-  ```
-
-- 元组可以通过方括号读取类型
-
-  ```ts
-  type Tuple = [string, number, Date];
-  type TupleEl = Tuple[number]; // type TupleEl = string | number | Date
-  ```
-
-### 函数
-
-```ts
-type mult1 = (x: number, y: number) => number;
-
-type mult2 = { (x: number, y: number): number }
-
-interface mult3 { (x: number, y: number): number; }
-```
-
-#### 可选参数
-
-**可选参数**：在参数末尾加上 `?` 实现可选参数
-
-- 函数体使用可选参数时，需要先判断该参数是否为 `undefined`
 - 可选参数必须在必选参数之后
-- 可选参数与显式 `undefined` 不同：可选参数可以省略，`undefined` 必须显式传参
+- 可选参数可以省略，`undefined` 必须显式传参
 
   ```ts
-  type F2 = (a: number, b: number | undefined) => number;
-  let f2: F2 = (x, y) => {
-    return x + (y ?? 0);
-  }
-  f2(1); // [!code --] 应有 2 个参数，但获得 1 个。
-  f2(1, undefined); // [!code ++]
+  type ISum1 = (a: string, b?: string) => string;
+  type ISum2 = (a: string, b: string | undefined) => string;
+  const sum1: ISum1 = (a, b) => a + b;
+  const sum2: ISum2 = (a, b) => a + b;
+  
+  sum1('1');
+  sum2('1');  // [!code error] 应有 2 个参数，但获得 1 个。
   ```
 
-#### 默认参数
+### 默认参数
 
 **默认参数**：提供一个默认值，当用户没有传递该参数或传递值为 `undefined` 时，默认初始化值的参数
 
@@ -644,55 +503,37 @@ add(1); // [!code --] 应有 2 个参数，但获得 1 个。
 add(undefined, 1); // [!code ++] 
 ```
 
-#### 参数解构
+### 参数的 this
 
-- 数组
+尽量不使用 `this` 作为函数上下文，`this` 的缺陷是类型推导问题
 
-  ```ts
-  type A = [x: number, y: number];
-  function sum([a, b]: A) {
-    return a + b;
-  }
-  ```
-
-- 对象
-
-  ```ts
-  type A = { x: number; y: number };
-  function sum({ x, y }: A) {
-    return x + y;
-  }
-  ```
-
-#### rest
-
-- `rest` 可以嵌套
-
-  ```ts
-  function f(...args: [boolean, ...string[]]) { }
-  ```
-
-- `rest` 可以结合解构使用
-
-  ```ts
-  function repeat(...[str, times]: [string, number]): string {
-    return str.repeat(times);
-  }
-  ```
-
-#### readonly
-
-`readonly` 表示只读参数，函数内部无法修改
+如果想限制 `this` 类型，`this` 参数必须是函数的第一个参数
 
 ```ts
-function arraySum(arr: readonly number[]) { }
+function getValue(this: { name: string, age: number }, key) {
+  return this[key];
+}
 ```
 
+> [!NOTE]  
+>
+> `"strictBindCallApply": true,`  需要更精确的 `this` 指向，详见 [keyof](#keyof)
 
+### rest
 
-#### 函数重载
+**剩余参数**：在函数中，不建议使用 `arguments`，而是 rest 参数
 
-**函数重载**：根据参数的不同，产生不同的函数行为
+```ts
+function sum(...args: number[]) {
+  return args.reduce((memo, cur) => (memo += cur, memo), 0);
+}
+```
+
+### 函数重载
+
+**函数重载**：根据参数类型的不同，产生不同的行为
+
+> 在 js 中重载使用 `arguments`
 
 ```ts
 function combine(a: number, b: number): number;
@@ -707,238 +548,62 @@ function combine(a: number | string, b: number | string): number | string {
 }
 ```
 
-## 其他类型
+## typeof
 
-- **联合类型**(union types)：多种类型任选其一；符号 `|`
-
-- **交叉类型**(intersection types)：多种类型叠加在一起形成一种新类型，包含了所需的所有类型的特性；符号：`&`
-
-- `void`：约束函数返回值；表示函数没有任何值返回
-
-- `never`：约束函数返回值；表示函数永远不会结束
-
-  > `never` 是"**底层类型**(bottom type)"，任何其他类型共有的
-
-- **值类型**：使用值进行约束，变量为字面量
-
-  ```ts
-  // 和联合类型一起约束, 表示只能取其中一个值
-  let gender: 'male' | 'female';
-  
-  // 约束空数组
-  let arr: [];
-  
-  // 约束对象属性的类型
-  let user: { 
-    name: string; 
-    age: number; 
-  }
-  ```
-
-- **元组**(Tuple)：定长数组，数组每一项的类型确定
-
-- `any`：任意类型；绕过类型检查
-
-  > `any` 是"**顶层类型**(top type)"，可以赋值给任意类型的数据
-
-- `unknown`：表示类型不确定，可能是任意类型；(严格的 `any`)，也是"**顶层类型**"(top type)
-
-  > [!NOTE]
-  >
-  > - `unknown` 类型的变量不能直接赋值给其他类型变量 (除了 `any` 和 `unknown`)
-  >
-  >
-  > - 不能直接调用 `unknown` 类型变量的方法和属性
-  >
-  >
-  > - `unknown` 类型能进行的运算是有限的，只能进行比较运算 (`==`, `===`, `!=`, `!==`, `||`, `&&`，`?`, `typeof`, `instanceof`)
-
-## 扩展类型
-
-### 类型别名
-
-`type`：类型别名；相当于 C++ 中的 `typedef`
-
-- 类型别名具有块级作用域
-
-  ```ts
-  function hello(txt: string) {
-    type msg = string;
-    let newTxt: msg = 'Hello' + txt;
-    return newTxt;
-  }
-  const newTxt: msg = hello('world'); // [!code error] 找不到名称“msg”。
-  ```
-
-- 类型别名不允许重名
-
-- 别名支持表达式，允许嵌套
-
-  ```ts
-  type World = "world";
-  type Greeting = `hello ${World}`;
-  ```
-
-
-
-### 枚举
-
-`enum`：定义一组带名称的常量，在编译结果中**表现为对象**
-
-> **表现为对象**
->
-> - 可以使用方括号运算符或点运算符调用对象的属性
->
-> - 不能出现与 enum 结构同名的变量
-
-::: code-group
-
-```ts[index.ts]
-enum Gender {
-  male = '男',
-  female = '女'
-};
-```
-
-```js[index.js]
-var Gender;
-(function (Gender) {
-    Gender["Male"] = "\u7537";
-    Gender["Female"] = "\u5973";
-})(Gender || (Gender = {}));
-
-export {};
-```
-
-:::
-
-**枚举规则**
-
-- 枚举字段值可以是字符串、数字(不能是 `bigint`)、表达式
-
-- 数字枚举的值会自增，默认值从 0 开始
-
-  ::: code-group
-
-  ```ts[index.ts]
-  enum Direction {
-      Up,
-      Down,
-      Left,
-      Right
-  }
-  ```
-
-  ```js[index.js]
-  var Direction;
-  (function (Direction) {
-      Direction[Direction["Up"] = 0] = "Up";
-      Direction[Direction["Down"] = 1] = "Down";
-      Direction[Direction["Left"] = 2] = "Left";
-      Direction[Direction["Right"] = 3] = "Right";
-  })(Direction || (Direction = {}));
-  export {};
-  ```
-
-  :::
-
-- 枚举的成员值是只读的，不能重新赋值(建议在声明时加上 `const` 修饰)
-
-  ```ts
-  const enum Color {
-    Red,
-    Green,
-    Blue
-  }
-  ```
-
-- 枚举可以混合，但尽量不要即出现字符串字段，又出现数字字段
-
-- 枚举可以合并
-
-  - 首个成员的值可以省略初始值
-  - 不能有同名的成员
-
-- `keyof`：取出枚举中的所有成员的名，作为联合类型返回
-
-  ```ts
-  enum MyEnum {
-    A = 'a',
-    B = 'b'
-  }
-  
-  type Foo = keyof typeof MyEnum; // type Foo = "A" | "B"
-  ```
-
-- `in`：取出索引
-
-  ```ts
-  enum MyEnum {
-    A = 'a',
-    B = 'b'
-  }
-  for (let key in MyEnum) {
-    console.log(key); // A B
-  }
-  ```
-
-- **反向映射**：通过成员值获取成员名
-
-  ```ts
-  enum Direction {
-      Up = 1,
-      Down,
-      Left,
-      Right
-  }
-  console.log(Direction[3]); // Left
-  ```
-
-  **原理**：两段赋值
-
-  ```ts
-  Direction[Direction["Up"] = 0] = "Up";
-  
-  // 等价于
-  Direction["Up"] = 0
-  Direction[0] = "Up";
-  ```
-
-  > 字符串不存在反向映射
-
-#### 枚举与值类型比较
-
-- **值类型**在类型约束时会产生重复代码
-
-  ```ts
-  type gender = '男' | '女';
-  ```
-
-- **值类型**逻辑含义何真实值产生混淆，需要修改大量代码
-
-- **值类型**不会产生在编译结果
-
-#### 枚举的位运算
+`typeof`：根据值获得类型；提取的类型会提升至顶部
 
 ```ts
-enum Permission {
-  Read = 1,
-  Write = 2,
-  Create = 3,
-  Delete = 4
+// 类型被提升到顶部
+function getValue(this: IPerson, key) {
+  return this[key];
 }
-
-// 1. 组合
-let p: Permission = Permission.Read | Permission.Write;
-
-// 2. 判断
-function hasPermission(target: Permission, per: Permission) {
-  return (target && per) === per;
-}
-
-// 3. 删除
-p = p ^ Permission.Write;
+const person = { name: 'Alex', age: 30, address: 'LA' };
+type IPerson = typeof person;
 ```
+
+## keyof
+
+`keyof`：获取对象所有键的并集
+
+```ts
+function getValue(this: IPerson, key: IKeys) {
+  return this[key];
+}
+const person = { name: 'Alex', age: 30, address: 'LA' };
+type IPerson = typeof person;
+type IKeys = keyof IPerson;
+```
+
+## 类
+
+`public`、`protected` 和 `private` 是类的访问修饰符，用于控制类成员 (属性、方法、构造函数等) 的访问权限
+
+- `public`：公开属性；类成员可以被任何地方访问，包括类内部、子类和外部代码，这是 TypeScript 成员**默认访问修饰符**
+- `protected`：类成员只能在类内部和子类中访问，外部代码无法直接访问
+
+- `private`：类成员只能在类内部访问，子类和外部代码都无法直接访问
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### 接口
 
@@ -1242,7 +907,7 @@ const s1: string = value as string;
 
 ### as const
 
-`as const`：类型推断时，将变量断言为**值类型**
+`as const`：类型推断时，将变量断言为 **值类型**
 
 - `as const` 只能用于字面量，不能用于变量
 - `as const` 无法用于表达式
