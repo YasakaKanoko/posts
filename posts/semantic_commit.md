@@ -4,10 +4,10 @@ title: 约定式提交
 category: git
 tags:
 - git
-description: 约定式提交规范是一种基于提交消息的轻量级约定。 它提供了一组用于创建清晰的提交历史的简单规则； 这使得编写基于规范的自动化工具变得更容易。 这个约定与 SemVer 相吻合， 在提交信息中描述新特性、bug 修复和破坏性变更
+description: Semantic Commits are commit messages with human and machine readable meaning, which follow particular conventions
 ---
 
-  # 理解语义化 Commit
+# **Semantic Commits**
 
   ::: details 目录
 
@@ -15,367 +15,285 @@ description: 约定式提交规范是一种基于提交消息的轻量级约定�
 
   :::
 
+## **Commit Message Format**
 
+Angular 约定要求根据以下结构来塑造提交消息
 
+```txt
+<type>(<scope>): <subject>
 
+<body>
 
-  ## Pull Request (PR)
+<footer>
+```
 
-  1. **Fork the Repository**
+提交信息由三部分组成：`header`、`body`、`footer`
 
-  2. **Clone Your Fork**
+- `type`：变更的类型
+- `scope`：(可选) 变更的上下文
+- `subject`：变化的简明描述
 
-     ```sh
-     git clone https://github.com/YourName/YourFork.git
-     ```
+### **The Header**
 
-  3. **Create a Branch**
+Header 在提交信息的第一行
 
-     ```sh
-     git checkout -b feature/YourFeatureName
-     ```
+```sh
+git commit -m "fix(core): remove deprecated and defunct wtf* apis"
+```
 
-  4. **Install Dependencies**
+通过一个 `:` 作为分隔，左侧是变更的类型，右侧是消息的含义 - (*此更改通过删除已弃用和已停用的 `wtf*` api 来修复属于核心包的一个错误* )
 
-  5. **Commit changes**
+### **The Body**
 
-     ```sh
-     git commit -m "docs: Update 2.installation.md" -m "Fix the content attribute in the tailwind.config.js config file."
-     ```
+正文部分是**可选的**，用于介绍动机或仅描述稍微详细的信息
 
-     - **Commit Message**
+```sh
+git commit -m "fix(core): remove deprecated and defunct wtf* apis" -m "These apis have been deprecated in v8, so they should stick around till v10, but since they are defunct we are removing them early so that they don't take up payload size."
+```
 
-     - **Extended description**
+> 此 commit 来自 [Angular](https://github.com/angular/angular/commit/cf420194ed91076afb66d9179245b9dbaabc4fd4)
 
-  6. **Push local branch to remote**
+> [!NOTE]
+>
+> - 我们使用多个 `-m` 连接段落
+> - 标题和正文之间应该使用空行分隔
 
-     ```sh
-     git push origin feature/YourFeatureName
-     ```
+### **The Footer**
 
-  7. **Create Pull Request**
+页脚是可选的，宣布**重大变化**，**链接已关闭**的问题，**提及贡献者**等等
 
-     - 参考项目根目录 `CONTRIBUTING` 和 `Code of Conduct` 查看提交的相关信息
+```sh
+git commit -m "fix(core): remove deprecated and defunct wtf* apis" -m "These apis have been deprecated in v8, so they should stick around till v10, but since they are defunct we are removing them early so that they don't take up payload size." -m "PR Close #33949"
+```
 
-     - 简单描述修改的问题，给出相应链接，并在对应图片中指出错误
+## **Common Types**
 
-       ```txt
-       Add a title:
-       	docs: fix content attribute in tailwind.config.js config file.
-       	
-       Add a description:
-       
-       Fix the content attribute in the tailwind.config.js config file.
-       
-       Problem: The content attribute in the [doc](https://inspira-ui.com/getting-started/installation) is empty, it will cause error during installation
-       ![image](https://github.com/user-attachments/assets/60206e0a-585d-49b2-b3a0-9c48aa4f6b31)
-       ```
+- **Development**：一种增强类型，对开发的变更进行分类，不影响生产，而是影响内部的环境和流程
+- **Production**：一种维护类型，仅对生产的变更，旨在提供给最终用户使用
 
-## Issues
+### 👷 build
 
-- [Smart](http://www.catb.org/~esr/faqs/smart-questions.html)
+`build` 类型，(也叫 `chore`)，识别与构建系统 (涉及脚本、配置或工具) 和包依赖项相关的**开发**更改
 
-  - [提问的智慧](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md)
+> 用于修改项目构建系统，例如修改依赖库、外部接口或者升级 Node 版本等
 
-  - [如何有效提交 bug](https://www.chiark.greenend.org.uk/~sgtatham/bugs-cn.html)
+```txt
+build: update dependency undici to v7 (#61522)
+build: migrate animations to use rules_js based toolchain (#61479)
+build: replace platform-browser-dynamic with  platform-browser (#61497)
+build: move private testing helpers outside platform-browser/testing (#61472)
+build: use an unstamped version of compiler-cli for running the angular compiler in ng_project (#61479)
+```
 
-  ## Semantic Commit Messages
+### 💚 **ci**
 
-  [Semantic Commit Messages](https://nitayneeman.com/posts/understanding-semantic-commit-messages-using-git-and-angular)：最初提出 Commit 约定的项目是 AngularJS，团队建立了详尽的文档说明成员们应该如何进行 Commit
+`ci` ：用于识别与持续集成和部署系统相关的**开发**变化——涉及脚本、配置或工具
 
-  [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) 是一种规范，简化了 Angular 约定并简单说明了一些基础的 Commit 约定
+```txt
+ci: change action: review to action: merge in update docs (#61533)
+ci: clean untracked files before running postUpgradeTasks (#61494)
+ci: replace yarn ng-dev misc update-generated-files with separate update commands for specific targets (#61467)
+ci: update step name in workflow (#61393)
+ci: disable updates for @angular/build-tooling (#61294)
+```
 
-  - semantic：提交信息语义化；将 Commit 分类，使其具有意义
+### 📝 **docs**
 
-  - conventional：提交信息是约定俗成的，格式是固定的，类型是常用的
+`docs` ：用于修改文档，例如修改 README 文件、API 文档等
 
-  语义化 Commit， 可以带来更高可读性和更快的速度，更利于编写自动化工具
+```txt
+docs: add llms.txt (#61285)
+docs: release notes for the v20.0.0-rc.1 release
+docs(docs-infra): preselect search text on re-open (#61129)
+docs: change supported versions when v20 releases (#61238)
+docs: rename @nodoc to @docs-private (#61194)
+```
 
-  ### 示例
+### ✨ **feat**
 
-  - 包含了描述并且脚注中有**破坏性变更**的提交说明
+`feat`：表示向后兼容的或功能相关的生产变化 (这和语义化版本中的 [`MINOR`](https://semver.org/lang/zh-CN/#摘要) 相对应)
 
-    ```sh
-    feat: allow provided config object to extend other configs
-    
-    BREAKING CHANGE: `extends` key in config file is now used for extending other config files
-    ```
+```sh
+feat(devtools): defer blocks  support (#60629)
+feat(common): Allow passing ScrollOptions to ViewportScroller (#61002)
+feat(core): rename afterRender to afterEveryRender and stabilize (#60999)
+feat(core): introduce TestBed.tick() (#60993)
+feat(compiler-cli): detect missing structural directive imports #59443
+```
 
-  - 包含了 `!` 字符以提醒注意破坏性变更的提交说明
+### 🐛 **fix**
 
-    ```sh
-    feat(api)!: send an email to the customer when a product is shipped
-    ```
+`fix`：表示识别与向后兼容的错误，修复相关的**生产**变化 (这和语义化版本中的 [`PATCH`](https://semver.org/lang/zh-CN/#摘要) 相对应)
 
-  - 包含了 `!` 和 BREAKING CHANGE 脚注的提交说明
+```txt
+fix(core): handle different DI token types in Chrome DevTools integration (#61333)
+fix(compiler-cli): avoid ECMAScript private field metadata emit (#61227)
+fix(core): enable stashing only when withEventReplay() is invoked (#61077)
+fix(compiler): incorrectly handling let declarations inside i18n (#60512)
+fix(devtools): fix profiler support with @defer blocks (#61080)
+```
 
-    ```sh
-    chore!: drop support for Node 6
-    
-    BREAKING CHANGE: use JavaScript features not available in Node 6.
-    ```
+### ⚡️ **perf**
 
-  - 不包含正文的提交说明
+`perf`：识别与向后兼容性能改进相关的**生产**变化——用于优化性能，例如提升代码的性能、减少内存占用等
 
-    ```sh
-    docs: correct spelling of CHANGELOG
-    ```
+```txt
+perf: refactor Array.includes checks to use Sets (#32133)
+perf(nuxt): use Set for circular dep plugin (#32110)
+perf(nuxt): use Intl.Collator instead of localeCompare (#32167)
+perf(nuxt): remove unecessary type check for useFetch (#31910)
+perf(nuxt): remove oxc-parser manual wasm fallback logic (#31484)
+```
 
-  - 包含范围的提交说明
+### ♻️ **refactor**
 
-    ```sh
-    feat(lang): add polish language
-    ```
+`refactor`：用于识别与修改代码库相关的**开发**更改，既不添加功能也不修复错误 - 例如删除冗余代码、简化代码、重命名变量等
 
-  - 包含多行正文和多行脚注的提交说明
+```txt
+refactor(core): Disallow autoDetectChanges(false) in zoneless (#61430)
+refactor(migrations): remove unused code (#61260)
+refactor(docs-infra): Clean up embedded editor code (#61242)
+refactor(language-service): initial reference and rename implementation for selectorless (#61240)
+refactor(compiler-cli): produce template symbols for selectorless nodes (#61240)
+```
 
-    ```sh
-    fix: prevent racing of requests
-    
-    Introduce a request id and a reference to latest request. Dismiss
-    incoming responses other than from latest request.
-    
-    Remove timeouts which were used to mitigate the racing issue but are
-    obsolete now.
-    
-    Reviewed-by: Z
-    Refs: #123
-    ```
+### 🎨 **style**
 
-  ### 格式
+`style`：用于修改代码的样式，例如调整缩进、空格、空行等
 
-  Angular 约定要求 Commit 分为 Header、Body、Footer 三部分
+```txt
+style(aio): add space between `.home` and `.hamburger` (#23624)
+style(bazel): fix 2 unformatted .bzl files
+style(core): fix max line length to pass linting (#20441)
+style(nodeTree): fix formatting
+style(compiler): fix lint issues (#23480)
+```
+
+### ✅ **test**
+
+`test`：用于识别与测试相关的**开发**变化 - 例如重构现有测试或添加新测试
+
+```txt
+test(router): Reduce timeout times (#61155)
+test: disable platform-server tests that do not work with zoneless (#61040)
+test: add integration test for platform-server with zoneless (#61040)
+test: add integration test for defer with input on SSR with zones (#61040)
+test(core): type tests for linkedSignal (#60857)
+```
+
+## **Browsing History**
+
+Git 为我们提供了浏览存储库提交历史记录的功能 - 因此我们能够了解实际发生了什么、谁做出了贡献等等
+
+- 显示所有以 `feat`、`fix`、`pref` 开头的消息
 
   ```sh
-  <type>[optional scope]: <description>
-  
-  [optional body]
-  
-  [optional footer(s)]
+  git log --oneline --grep "^feat|^fix|^perf"
   ```
 
-  [GitHub 文档格式](https://docs.github.com/zh/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
-
-  #### Header
-
-  Header 是**必填项**，这一行简单描述本次提交的修改，最大 100 字符
-
-  Header 包含三个部分
-
-  - Type：短小的前缀，说明更改的类型
-
-  - Scope：可写，说明更改的上下文
-
-  - Subject：本次修改的简洁描述
-
-  Git 中只是 Commit 信息的第一行
-
-  - `:` 左侧部分称为前缀
-    - `type`：`fix` 操作
-    - `scope`：表示受影响的包是 `core`
-  - `:` 右侧部分是 `subject` 表示本次提交的主题
+- 显示以 `feat` 开头的提交总数
 
   ```sh
-  # 修复了 core 包中的 bug，具体操作是 remove deprecated and defunct wtf* apis
-  git commit -m "fix(core): remove deprecated and defunct wtf* apis"
+  git log --oneline --grep "^feat" | wc -l
   ```
 
-  #### Body
+## **Automated Releases**
 
-  Body 非必填，描述此次修改的原因，或者关于此次修改的细节
+提交消息格式对于自动化发布过程的步骤很有用，如：[Standard Version](https://github.com/conventional-changelog/standard-version)和[Semantic Release](https://github.com/semantic-release/semantic-release) 这样的工具 之外，还应当严格遵循[语义版本控制](https://semver.org/)规范。它们之间的主要区别在于[方法](https://github.com/conventional-changelog/standard-version#how-is-standard-version-different-from-semantic-release)
 
-  ```sh
-  git commit -m "fix(core): remove deprecated and defunct wtf* apis" -m "These apis have been deprecated in v8, so they should stick around till v10, but since they are defunct we are removing them early so that they don't take up payload size."
-  ```
+基于提交信息，尤其是**类型**
 
-  `-m` 分段描写，Header 和 Body 之间必须有空行，这种操作自带空行
+- 升级下一个语义版本 (`fix` 导致 **patch**，`feat` 和 `perf` 导致 **minor**，breaking change 变更 **major**)
 
-  > [!NOTE]
-  >
-  > 分行操作不只有 `-m` 这一种方式，但是 `-m` 可以适配各种 shell
+- 生成包含相关生产变更的 CHANGELOG 和 release notes
+- 为新版本创建 Git Tag
+- 将 release 发布到 npm 仓库中
 
-  #### Footer
+ 如：Ionic 的 [angular-toolkit](https://github.com/ionic-team/angular-toolkit) 项目集成了 Semantic Release 来自动化发布过程 (遵循 Angular 提交约定)
 
-  Footer 非必填，描述提交的"后续效果"，如：此次修改是 breaking change、关闭 issue、提及贡献者等
+- 🤖 表示自动完成
 
-  ::: code-group
+## **Using Emojis**
 
-  ```sh[git]
-  git commit -m "fix(core): remove deprecated and defunct wtf* apis" -m "These apis have been deprecated in v8, so they should stick around till v10, but since they are defunct we are removing them early so that they don't take up payload size." -m "PR Close #33949"
-  ```
+表情符号附加到提交信息，提高可读性，以便在浏览历史记录时可以非常快速轻松地识别它们
 
-  ```sh[vim]
-  fix(core): remove deprecated and defunct wtf* apis (#33949)
-  These apis have been deprecated in v8, so they should stick around till v10,
-  but since they are defunct we are removing them early so that they don't take up payload size.
-  
-  PR Close #33949
-  ```
+- [gitmoji](https://github.com/carloscuesta/gitmoji)
 
-  :::
+- [Commit Message Emoji](https://github.com/dannyfritz/commit-message-emoji)
 
-  此 commit 来自 [Angular](https://github.com/angular/angular/commit/cf420194ed91076afb66d9179245b9dbaabc4fd4)
+## **Tool**
 
-  ### 类型
+- [cz-cli](https://github.com/commitizen/cz-cli)：强制执行提交消息格式的工具
 
-  [config-conventional](https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional)(基于[Angular 约定](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines))中推荐的 `build:`、`chore:`、 `ci:`、`docs:`、`style:`、`refactor:`、`perf:`、`test:`
+- [commitlint](https://github.com/conventional-changelog/commitlint)：保证提交消息符合格式约定
+- [Commit Message Editor](https://marketplace.visualstudio.com/items?itemName=adam-bender.commit-message-editor)：💬 Visual Studio Code 扩展，以方便的方式编辑提交消息
+- [Git - Semantic Commit Go](https://marketplace.visualstudio.com/items?itemName=nitayneeman.git-semantic-commit)：💬 Visual Studio Code 扩展，可以通过语义消息约定轻松提交
 
-  - `build` ：用于修改项目构建系统，例如修改依赖库、外部接口或者升级 Node 版本等
+## **Specification**
 
-    ```sh
-    build: update dependency undici to v7 (#61522)
-    build: migrate animations to use rules_js based toolchain (#61479)
-    build: replace platform-browser-dynamic with  platform-browser (#61497)
-    build: move private testing helpers outside platform-browser/testing (#61472)
-    build: use an unstamped version of compiler-cli for running the angular compiler in ng_project (#61479)
-    ```
+1. 每个提交都**必须**使用类型字段前缀
 
-  - `chore`：用于对非业务性代码进行修改，例如修改构建流程或者工具配置等
+   - `feat` ：当一个提交为应用或类库实现了新功能时，使用该类型
 
-    ```sh
-    chore(deps): upgrade unimport to v5.0.0
-    chore(deps): pin devdependency @codspeed/core to 4.0.1 (main) (#32145)
-    chore: upgrade webpack dependencies separately
-    chore: remove unneeded JSdoc comments (#32090)
-    chore(deps): update all non-major dependencies (main) (#31992)
-    ```
+   - `fix`：当一个提交为应用修复了 bug 时，使用该类型
 
-  - `ci`：用于修改持续集成流程，例如修改 Travis、Jenkins 等工作流配置
+   - **范围字段** (可选)：**可以**跟随在类型字段后面。范围**必须**是一个描述某部分代码的名词，并用圆括号包围，例如： `fix(parser):`
 
-    ```sh
-    ci: change action: review to action: merge in update docs (#61533)
-    ci: clean untracked files before running postUpgradeTasks (#61494)
-    ci: replace yarn ng-dev misc update-generated-files with separate update commands for specific targets (#61467)
-    ci: update step name in workflow (#61393)
-    ci: disable updates for @angular/build-tooling (#61294)
-    ```
+   - `!` (可选)：在类型/作用域之后，`:` 之前，加上 `!` 字段，进一步提醒注意破坏性的变更；当有 `!` 前缀时，正文或脚注内必须包含 `BREAKING CHANGE: description`
 
-  - `docs`：用于修改文档，例如修改 README 文件、API 文档等
+     ```txt
+     chore!: drop Node 6 from testing matrix
+     
+     BREAKING CHANGE: dropping Node 6 which hits end of life in April
+     ```
 
-    ```sh
-    docs: add llms.txt (#61285)
-    docs: release notes for the v20.0.0-rc.1 release
-    docs(docs-infra): preselect search text on re-open (#61129)
-    docs: change supported versions when v20 releases (#61238)
-    docs: rename @nodoc to @docs-private (#61194)
-    ```
+   - **描述**：对代码变更的简短总结；描述字段**必须**直接跟在 `<类型>(范围)` 前缀的冒号和空格之后。
 
-  - `feat`：表示在代码库中新增了一个功能 (这和语义化版本中的 [`MINOR`](https://semver.org/lang/zh-CN/#摘要) 相对应)
-
-    ```sh
-    feat(devtools): defer blocks  support (#60629)
-    feat(common): Allow passing ScrollOptions to ViewportScroller (#61002)
-    feat(core): rename afterRender to afterEveryRender and stabilize (#60999)
-    feat(core): introduce TestBed.tick() (#60993)
-    feat(compiler-cli): detect missing structural directive imports #59443
-    ```
-
-  - `fix`：表示在代码库中修复了一个 bug (这和语义化版本中的 [`PATCH`](https://semver.org/lang/zh-CN/#摘要) 相对应)
-
-    ```sh
-    fix(core): handle different DI token types in Chrome DevTools integration (#61333)
-    fix(compiler-cli): avoid ECMAScript private field metadata emit (#61227)
-    fix(core): enable stashing only when withEventReplay() is invoked (#61077)
-    fix(compiler): incorrectly handling let declarations inside i18n (#60512)
-    fix(devtools): fix profiler support with @defer blocks (#61080)
-    ```
-
-  - `perf`：用于优化性能，例如提升代码的性能、减少内存占用等
-
-    ```sh
-    perf: refactor Array.includes checks to use Sets (#32133)
-    perf(nuxt): use Set for circular dep plugin (#32110)
-    perf(nuxt): use Intl.Collator instead of localeCompare (#32167)
-    perf(nuxt): remove unecessary type check for useFetch (#31910)
-    perf(nuxt): remove oxc-parser manual wasm fallback logic (#31484)
-    ```
-
-  - `refactor`：用于重构代码，例如修改代码结构、变量名、函数名等但不修改功能逻辑
-
-    ```sh
-    refactor(core): Disallow autoDetectChanges(false) in zoneless (#61430)
-    refactor(migrations): remove unused code (#61260)
-    refactor(docs-infra): Clean up embedded editor code (#61242)
-    refactor(language-service): initial reference and rename implementation for selectorless (#61240)
-    refactor(compiler-cli): produce template symbols for selectorless nodes (#61240)
-    ```
-
-  - `style`：用于修改代码的样式，例如调整缩进、空格、空行等
-
-    ```sh
-    style(aio): add space between `.home` and `.hamburger` (#23624)
-    style(bazel): fix 2 unformatted .bzl files
-    style(core): fix max line length to pass linting (#20441)
-    style(nodeTree): fix formatting
-    style(compiler): fix lint issues (#23480)
-    ```
-
-  - `test`：用于修改测试用例，例如添加、删除、修改代码的测试用例等
-
-    ```sh
-    test(router): Reduce timeout times (#61155)
-    test: disable platform-server tests that do not work with zoneless (#61040)
-    test: add integration test for platform-server with zoneless (#61040)
-    test: add integration test for defer with input on SSR with zones (#61040)
-    test(core): type tests for linkedSignal (#60857)
-    ```
-
-  ### 规范
-
-  1. 每个提交都**必须**使用类型字段前缀，如： `feat` 或 `fix` ， 后接**可选的**范围字段，**可选的** `!`，以及**必要的**冒号（英文半角）和空格
-
-  2. `feat` ：当一个提交为应用或类库实现了新功能时，**必须**使用该类型
-
-  3. `fix`：当一个提交为应用修复了 bug 时，**必须**使用该类型
-
-  4. 范围字段**可以**跟随在类型字段后面。范围**必须**是一个描述某部分代码的名词，并用圆括号包围，例如： `fix(parser):`
-
-  5. 描述：对代码变更的简短总结；描述字段**必须**直接跟在 `<类型>(范围)` 前缀的冒号和空格之后。
-
-     ```sh
+     ```txt
      fix: array parsing issue when multiple spaces were contained in string
      ```
 
-  6. 在简短描述之后，**可以**编写较长的提交正文，为代码变更提供额外的上下文信息。正文**必须**起始于描述字段结束的一个空行后
+2. **正文**：为代码变更提供额外的上下文信息。正文**必须**起始于描述字段结束的一个空行后
 
-  7. 提交的正文内容自由编写，**可以**使用空行分隔不同段落
+   - 提交的正文内容自由编写，**可以**使用空行分隔不同段落
 
-  8. 正文结束的一个空行之后，**可以**编写一行或多行脚注。每行脚注都**必须**包含一个令牌（token），后面紧跟 `:<space>` 或 `<space>#` 作为分隔符，后面再紧跟令牌的值
+     ```txt
+     fix: correct minor typos in code
+     
+     see the issue for details on the typos fixed
+     
+     closes issue #12
+     ```
 
-  9. 脚注的令牌**必须**使用 `-` 作为连字符，比如：`Acked-by` (这样有助于区分脚注和多行正文)。有一种例外情况就是 `BREAKING CHANGE`，它**可以**被认为是一个令牌
+3. **脚注**：正文结束的一个空行之后，**可以**编写一行或多行脚注。脚注必须包含提交的元信息，如：关联的合并请求、Reviewer、破坏性的变更
 
-  10. 脚注的值**可以**包含空格和换行，值的解析过程**必须**直到下一个脚注的令牌/分隔符出现为止
+   - 破坏性变更必须在正文区域最开始处，或脚注区域某一行开始，一个破坏性变更必须包含大写的 `BREAKING CHANGE`
 
-  11. 破坏性变更**必须**在提交信息中标记出来，要么在 `<类型>(范围)` 前缀中标记，要么作为脚注的一项
+     ```txt
+     BREAKING CHANGE: environment variables now take precedence over config files.
+     ```
 
-  12. 包含在脚注中时，破坏性变更**必须**包含大写的文本 `BREAKING CHANGE`，后面紧跟着冒号、空格，然后是描述
+   - 描述正文内有破坏性变更的提交说明
 
-      ```sh
-       BREAKING CHANGE: environment variables now take precedence over config files
-      ```
+     ```txt
+     feat: allow provided config object to extend other configs
+     
+     BREAKING CHANGE: `extends` key in config file is now used for extending other config files
+     ```
 
-  13. 包含在 `<类型>(范围)` 前缀时，破坏性变更**必须**通过把 `!` 直接放在 `:` 前面标记出来。如果使用了 `!`，那么脚注中**可以**不写 `BREAKING CHANGE:`，同时提交信息的描述中**应该**用来描述破坏性变更
+### 如果我不小心使用了错误的提交类型
 
-  14. 在提交说明中，**可以**使用 `feat` 和 `fix` 之外的类型
+例如将 `feat` 写成了 `fix`，在合并或发布这个错误之前，我们建议使用 `git rebase -i` 来编辑提交历史
 
-      ```sh
-      docs: updated ref docs
-      ```
+## **References**
 
-  15. 工具的实现必须**不区分**大小写地解析构成约定式提交的信息单元，只有 `BREAKING CHANGE` **必须**是大写的
+- [Understanding Semantic Commit Messages Using Git and Angular](https://nitayneeman.com/blog/understanding-semantic-commit-messages-using-git-and-angular/)
 
-  16. BREAKING-CHANGE 作为脚注的令牌时**必须**是 BREAKING CHANGE 的同义词
+- [AngularJS Git Commit Message Conventions](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit?pli=1&tab=t.0#heading=h.uyo6cb12dt6w)
 
-  #### 如果我不小心使用了错误的提交类型
+- [Karma](https://karma-runner.github.io/4.0/dev/git-commit-msg.html)
 
-  例如将 `feat` 写成了 `fix`，在合并或发布这个错误之前，我们建议使用 `git rebase -i` 来编辑提交历史
+- [📓 Lint commit messages](https://github.com/conventional-changelog/commitlint/tree/master/@commitlint/config-conventional)
+- [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
-  ### Emoji
-
-  - [gitmoji](https://github.com/carloscuesta/gitmoji)
-
-  - [Commit Message Emoji](https://github.com/dannyfritz/commit-message-emoji)
-
-  ## References
-
-  - [Understanding Semantic Commit Messages Using Git and Angular](https://nitayneeman.com/blog/understanding-semantic-commit-messages-using-git-and-angular/)
+- [standard-version](https://github.com/conventional-changelog/standard-version)

@@ -33,7 +33,9 @@ description: 语义化版本 (Semantic Versioning, 简称 SemVer) 是一种版�
 
 ## 语义化版本控制规范 (SemVer)
 
-以下关键词 MUST、MUST NOT、REQUIRED、SHALL、SHALL NOT、SHOULD、SHOULD NOT、 RECOMMENDED、MAY、OPTIONAL 依照 RFC 2119 的叙述解读
+以下关键词 MUST、MUST NOT、REQUIRED、SHALL、SHALL NOT、SHOULD、SHOULD NOT、 RECOMMENDED、MAY、OPTIONAL 依照 RFC 2119 (Key words for use in RFCs to Indicate Requirement Levels) 的叙述解读
+
+1. 使用语义化版本控制的软件必须（MUST）定义公共 API
 
 ## References
 
