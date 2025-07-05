@@ -15,22 +15,25 @@ description: TypeScript is JavaScript with syntax for types.
 
 :::
 
-## **什么是 TypeScript？**
+## **什么是 TS？**
 
-- TypeScript 是 JavaScript 超集，遵循 ES5/ES6 规范，TypeScript 扩展了 JavaScript 语法
+JS 的核心特点是灵活，随着项目规模的扩大，灵活增加了开发的心智负担。代码的任何一个变量都可以被赋予字符串、布尔、数字甚至函数，充满了不确定性。这些代码的不确定性导致错误需要在运行时才能发现，所以需要类型约束
 
-- 需要先将 TS 代码转换为 JavaScript (JS) 代码才能执行
-- TypeScript 的主要目的是在开发阶段提供类型检查和更好的代码组织，但最终都需要通过编译器将其转换为 JS，以便在浏览器或 Node.js 中运行
+- TS 是 JS 超集，遵循 ES5/ES6 规范，TS 扩展了 JS 语法
 
-### TS 编译器
+- 需要先将 TS 代码转换为 JS 代码才能执行
+- TS 的主要目的是在开发阶段提供类型检查和更好的代码组织，但最终都需要通过编译器将其转换为 JS，以便在浏览器或 Node.js 中运行
 
-1. 初始化
+## 搭建环境
+
+1. 安装 TypeScript 编译器，创建 `tsconfig.json` 文件
 
    ::: code-group
 
    ```sh[tsc]
    npm i -g typescript
    tsc --init
+   npm init -y
    ```
 
    ```sh[bun]
@@ -39,109 +42,36 @@ description: TypeScript is JavaScript with syntax for types.
 
    :::
 
-2. 类型检查
+   > [!NOTE]
+   >
+   > **注意**：模块是 ES 模块
 
    ::: code-group
 
-   ```sh[npm]
-   npm i -D @types/node
-   ```
-
-   ```sh[bun]
-   bun add -D @types/bun
-   ```
-
-   :::
-
-#### 热更新 (可选)
-
-- 使用 vscode 插件：[Code Runner](https://marketplace.visualstudio.com/items?itemName=formulahendry.code-runner)
-
-- Node.js 需要使用 `Nodemon`
-
-  ::: code-group
-
-  ```sh[Node.js]
-  # "start": "nodemon --watch src -e ts --exec ts-node src/index.ts"
-  npm run start
-  ```
-
-  ```sh[bun]
-  bun --watch run index.ts
-  ```
-
-  :::
-
-- `tsc --watch`：热更新
-
-#### 构建工具
-
-1. 通过构建工具 (webpack、rollup、esbuild) 将 ts 转换为 js 运行
-
-   ```sh
-   npm i rollup typescript rollup-plugin-typescript2 @rollup/plugin-node-resolve -D
-   ```
-
-2. 配置文件
-
-   ::: code-group
-
-   ```json[package.json]
+   ```json[tsconfig.json]
    {
-     "scripts": {
-       "dev": "rollup -c -w"
-     },
-     "devDependencies": {
-       "@rollup/plugin-node-resolve": "^16.0.1",
-       "@types/node": "^24.0.8",
-       "rollup": "^4.44.1",
-       "rollup-plugin-typescript2": "^0.36.0",
-       "typescript": "^5.8.3"
+     "compilerOptions": {
+       "lib": ["ESNext"],
+       "target": "es2016", 
+       "module": "esnext",  // [!code focus] [!code highlight]
+       "sourceMap": true, 
+   
+       "esModuleInterop": true,
+       "forceConsistentCasingInFileNames": true, 
+       "strict": true,
+       "skipLibCheck": true
      }
    }
    ```
 
-   ```js[rollup.config.js]
-   import ts from 'rollup-plugin-typescript2'
-   import { nodeResolve } from '@rollup/plugin-node-resolve'
-   import { resolve, dirname } from 'path'
-   import { fileURLToPath } from 'url'
-   
-   
-   // 当前文件的绝对路径
-   const __filename = fileURLToPath(import.meta.url);
-   const __dirname = dirname(__filename)
-   export default {
-     // 项目入口文件
-     input: "./src/index.ts",
-     // 项目出口文件
-     output: {
-       // 打包的结果在dist目录
-       file: resolve(__dirname, 'dist/bundle.js'),
-       // 打包的结果是一个函数
-       format: 'iife',
-       sourcemap: true
-     },
-     plugins: [
-       nodeResolve({
-         // 第三方包入口文件可以是ts也可以是js
-         extensions: ['.ts', '.js']
-       }),
-       ts({
-         tsconfig: resolve(__dirname, 'tsconfig.json')
-       })
-     ]
-   }
-   ```
-
-   ```json[tsconfig.json]
+   ```json[tsconfig.json(bun)]
    {
      "compilerOptions": {
      
      	// Environment setup & latest features
        "lib": ["ESNext"], 
-       "target": "ESNext", 
-       "module": "esnext",
+       "target": "ESNext",
+       "module": "esnext", // [!code focus] [!code highlight]
        "moduleDetection": "force", 
        "jsx": "react-jsx", 
        "allowJs": true,
@@ -169,17 +99,115 @@ description: TypeScript is JavaScript with syntax for types.
 
    :::
 
-3. 项目结构
+2. 安装项目的开发依赖
 
-   ```txt
-   ts
-   ├─ package-lock.json
-   ├─ package.json
-   ├─ rollup.config.ts
-   ├─ src
-   │  └─ index.ts
-   └─ tsconfig.json
+   ```sh
+   npm install -D typescript rollup rollup-plugin-typescript2 @rollup/plugin-node-resolve rollup-plugin-serve
    ```
+
+   - `typescript` ：`tsc` 编译器
+   - `rollup` ：构建工具
+   - `rollup-plugin-typescript2` ：使 Rollup 能够处理 TypeScript 文件
+   - `@rollup/plugin-node-resolve` ：帮助 Rollup 从 `node_modules` 解析模块，使其能处理项目中的依赖
+   - `rollup-plugin-serve` ：提供本地开发服务器
+
+3. 通过构建工具 (如：rollup、esbuild) 将 ts 转换为 js，配置文件如下
+
+   ::: code-group
+
+   ```json[package.json]
+   "scripts": {
+     "dev": "rollup -c -w"
+   },
+   "devDependencies": {
+     "@rollup/plugin-node-resolve": "^16.0.1",
+     "rollup": "^4.44.2",
+     "rollup-plugin-serve": "^3.0.0",
+     "rollup-plugin-typescript2": "^0.36.0",
+     "typescript": "^5.8.3"
+   }
+   ```
+
+   ```js[rollup.config.js]
+   import ts from 'rollup-plugin-typescript2'
+   import serve from 'rollup-plugin-serve'
+   import { nodeResolve } from '@rollup/plugin-node-resolve'
+   import { resolve, dirname } from 'path'
+   import { fileURLToPath } from 'url'
+   
+   const __filename = fileURLToPath(import.meta.url)
+   const __dirname = dirname(__filename)
+   
+   export default {
+     input: resolve(__dirname, "src/index.ts"),
+     output: {
+       file: resolve(__dirname, 'dist/bundle.js'),
+       format: 'iife',
+       sourcemap: true
+     },
+     plugins: [
+       nodeResolve({
+         extensions: ['.js', '.ts']
+       }),
+       ts({
+         tsconfig: resolve(__dirname, 'tsconfig.json')
+       }),
+       serve({
+         port: 3000,
+         openPage: '/public/index.html',
+         // open: true
+       })
+     ]
+   }
+   ```
+
+   :::
+
+### 热更新
+
+- [Code Runner](https://marketplace.visualstudio.com/items?itemName=formulahendry.code-runner)：直接运行 TS 文件
+
+  > [!TIP]
+  >
+  > 需要安装 `ts-node`
+  >
+  > ```sh
+  > npm i -g ts-node
+  > ```
+
+- 热更新
+
+  ::: code-group
+
+  ```sh[Node.js]
+  # "dev": "rollup -c -w"
+  npm run dev
+  ```
+
+  ```sh[bun]
+  bun --watch run index.ts
+  ```
+
+  :::
+
+- `tsc --watch`：热更新
+
+### 项目结构
+
+```txt
+ts
+├─ dist                  # 编译输出目录
+│  ├─ bundle.js          # Rollup 打包后的 JavaScript 文件
+│  └─ bundle.js.map      # Source Map 文件，用于调试
+├─ package-lock.json     # npm 依赖锁文件，记录依赖的具体版本
+├─ package.json          # 项目配置文件，包含依赖、脚本等信息
+├─ public                # 静态资源目录
+│  └─ index.html         # 项目入口 HTML 文件
+├─ rollup.config.js      # Rollup 打包工具的配置文件
+├─ src                   # 源代码目录
+│  └─ index.ts           # TypeScript 入口文件
+└─ tsconfig.json         # TypeScript 编译配置文件
+```
 
 ## 基本类型
 
